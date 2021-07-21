@@ -1,165 +1,105 @@
-# Submitting jobs using SLURM
+# Using Slurm to submit jobs on Cannon
 
-**NOTE: The Odyssey cluster was renamed to Cannon in September 2016.**
+The Cannon cluster uses the [Slurm](https://slurm.schedmd.com/) to manage its computational resources.  Here we provide a brief overview of how you can use Slurm to schedule jobs.
 
-This page describes how to:
+We also recommend that you read the [Running Jobs](https://docs.rc.fas.harvard.edu/kb/running-jobs/) page on the FASRC documentation site, which contains more detailed information about Slurm.
 
-1.  [Request an interactive job](#Request_an_interactive_job)
-2.  [Submit jobs to the queue](#Submit_jobs_to_the_queue)
-3.  [Check the status of jobs (both interactive and
-    queued)](#Check%20the%20status%20of%20jobs)
-4.  [Request enough time and
-    memory](#Request%20enough%20time%20and%20memory)
-5.  [Check your fairshare score (which determines how frequently your
-    jobs will start)](#Check%20your%20fairshare%20score)
+## Where will I run my jobs?
 
-## The HUCE climate partitions
+### The HUCE climate partitions
 
-The Harvard University Center for the Enviroment has purchased several
-dedicated partitions on Cannon. For more information, please see the
-[HUCE Partitions page on the FASRC documentation
-site](https://docs.rc.fas.harvard.edu/kb/huce-partitions/).
+The Harvard University Center for the Enviroment has purchased several dedicated partitions on Cannon for exclusive use by Harvard atmospheric and climate modeling groups.  These [HUCE partitions](https://docs.rc.fas.harvard.edu/kb/huce-partitions/) have no time and memory limits, and are where you should run 
 
-Long story short: for most jobs, we recommmend using **huce\_intel**.
-You can also use **huce\_cascade**, especially if **huce\_intel** is
-busy.
+For most jobs, we recommmend the using `huce\_intel` partition, which consists of Intel Haswell and Broadwell CPUs. This should be fine for most purposes.
 
-NOTE: While it is possible to start interactive sessions in the
-**huce\_intel** partition, this will likely increase your fairshare
-score, which may cause your jobs to to take longer to start. For this
-reason, we recommend using the **test** partition for all interactive
+For more intensive modeling needs (or when `huce_intel` is busy), consider using the `huce\_cascade` partition.  This partition contains Intel Cascade Lake CPUs (which are newer and faster than the ones on `huce_intel`).
+
+While it is possible to start interactive sessions in the `huce\_intel` or `huce_cascade` partitions, this will likely increase your [fairshare score](https://docs.rc.fas.harvard.edu/kb/fairshare/), which may cause your jobs to to take longer to start. For this reason, we recommend using the **test** partition for all interactive
 sessions.
 
-\--- *GEOS-Chem Support Team 2020/03/06 18:03*
+### Other available partitions
 
-## Other available partitions
+Cannon has other partitions [(described here in detail)](<https://docs.rc.fas.harvard.edu/kb/running-jobs/#Slurm_partitions>) that you can use.  However, your job will be competing for resources with users across the entire Cannon cluster.
 
-More resources (memory and wall time) are available on other Cannon
-partitions, which are described in more detail at
-<https://www.rc.fas.harvard.edu/resources/running-jobs/#Slurm_partitions>.
+## Useful SLURM commands
 
-Other partitions commonly used by the group are described below:
+Before we go too much further, please take a moment to [review some of the more commonly used SLURM commands](<https://docs.rc.fas.harvard.edu/kb/convenient-slurm-commands/>)
 
-| Partition           | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **shared**          | This is the primary partition available to Cannon users. Comprised of 14,592 Intel Broadwell cores, each node has 128 GB of RAM and all are connected via Mellanox FDR Infiniband. By our own internal benchmarking this compute is four times faster than the older AMD chips that make up the general partition. This partition has a 7 day run time limit, similar to general. This partition replaces the `general` partition as of November 2017, but `general` is still available for jobs requiring larger amounts of contiguous memory.                                                                                |
-| **test**            | This partition is primarily for code testing ahead of large scale runs on the shared partition and for interactive jobs. To enable faster access and to ensure that everyone can find space here for interactive and testing purposes, we have set the time limit for this partition to 8 hours. This will also cut down on abuse/misuse of this partition. The test partition is made up of 8 nodes of the same Intel compute as shared. We have set a limit of a maximum of 5 jobs per user and 64 cores across all jobs for a user on this partition. This partition replaces the `interact` partition as of November 2017. |
-| **serial\_requeue** | This partition is appropriate for single core (serial) jobs or jobs that require up to 8 cores for small periods of time (less than 1 day). The maximum runtime for this queue is 7 days. MPI jobs are not appropriate for this partition. As this partition is made up of an assortment of nodes owned by other groups in addition to the general nodes, jobs in this partition may be killed but automatically requeued if a higher priority job (e.g. the job of a node owner) comes in.                                                                                                                                    |
+## Requesting interactive jobs
 
-## Request an interactive job
-
-When you log into AS or Cannon, you will be placed into a login node.
-The login nodes are sufficient for light computation, but for more
-CPU-intensive tasks (e.g. running GEOS-Chem in interactive mode,
-compiling with more than one processor, running IDL scripts), you should
-request an interactive job.
+When you log into Cannon, you will be placed into a login node.  The login nodes are sufficient for light computation, but for more CPU-intensive tasks (e.g. running GEOS-Chem in interactive mode, compiling with more than one processor, running IDL scripts), you should request an interactive job.
 
 ### Using the SLURM srun command
 
-**This section describes how to use the SLURM srun command to submit
-interactive jobs. But know that the GEOS-Chem Support Team has created
-[a script that simplifies the process of starting an interactive
-session](#Using%20the%20interactive_openmp%20script) for you, so you
-don't have to call srun directly.**
-
-You can start an interactive session with the SLURM **srun**, which uses
-the syntax listed below. Text bracketed by \<\> denotes text typed by
-the user at the command line:
+You can start an interactive session with the SLURM **srun**, which uses the syntax listed below. Text bracketed by \<\> denotes text typed by the user at the command line:
 
 ``` 
    srun -p <PARTITION> --pty --x11=first --mem=<MB> -c <NUMBER-OF-CORES> -N <NUMBER-OF-NODES> -t <TIME> --constraint=<CPUTYPE> -w <NODENAME> /bin/bash
 ```
 
-| Option                 | Argument type | Description                                                                                                                                                                                                                          |
-| ---------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `-p <PARTITION-NAME>`  | Required      | Request a specific partition (aka queue) for the resource allocation. We recommend starting all interactive sessions in the Cannon **test** partition.                                                                               |
-| `-pty`                 | Required      | Start task 0 in pseudo-terminal mode. Implicitly ends stderr and stdout streams to dev/null for all tasks except task zero.                                                                                                          |
-| `--x11=first`          | Required      | Start X11 display on the first task.                                                                                                                                                                                                 |
-| `-c <NUMBER-OF-CORES>` | Required      | Specifies the number of cores per node that your job will use.                                                                                                                                                                       |
-| `-N <NUMBER-OF-NODES>` | Required      | Request the number of nodes that will be allocated to this job. For GEOS-Chem "Classic" simulations, you can only use 1 node due to limitations of the OpenMP parallelization. For GCHP simulations, you may use more than one node. |
-| `--mem=<MB>`           | Required      | Specify the real memory required per node in MegaBytes. **(Recommended)**                                                                                                                                                            |
+where:
 
-|
+`-p <PARTITION-NAME>`
+  - Requests a specific partition (aka queue) for the resource allocation. We recommend starting all interactive sessions in the Cannon **test** partition.                                                                               |
+ 
+`-pty`
+  - Starts in pseudo-terminal mode. 
 
-|                          |          |                                                                                                                                                                                                                |
-| ------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `-t <TIME>`              | Required | Specify a time limit for the interactive job in minutes. Some acceptable formats for time are **minutes**, **hours:minutes:seconds**, and **days-hours:minutes**.                                              |
-| `--constraint=<CPUTYPE>` | Optional | Request that the interactive session only execute on nodes having a specific type of CPU. For example, if you only wanted to run on Intel CPUs, you could type **--constraint=intel**.                         |
-| `-w <NODENAME>`          | Optional | Request that the interactive session to execute on a specific node. For example, if you wanted to start a session on the **holyjacob01** node, you could type **-w holyjacob01**.                              |
-| `--no-requeue`           | Optional | Tells the SLURM scheduler not to automatically re-submit your job when a node fails and reboots. It is always best to manually restart your GEOS-Chem simulation using the most recently-created restart file. |
-| `/bin/bash`              | Required | The Unix shell (in this case, bash) that you want to use for the interactive session. In this case, because we are using bash, your .bashrc and any subsequent startup files will also be sourced.             |
+`--x11=first`
+  - Starts X11 display (for graphical window display)
 
-After you request an interactive session, you may notice that your login
-prompt may change. For example, when you log into Cannon using
-`login.rc.fas.harvard.edu`, your Unix prompt may have looked like this:
+`-c <NUMBER-OF-CORES>`
+  - Specifies the number of cores per node that your job will use.
+
+`-N <NUMBER-OF-NODES>`
+  - Requests the number of nodes that will be allocated to this job.
+    - For GEOS-Chem "Classic" simulations, you can only use 1 node due to limitations of the OpenMP parallelization.
+    - For GCHP simulations, you may use more than one node.
+
+`--mem=<MB>`
+  - Specifies the real memory required per node in MegaBytes.
+
+`-t <TIME>`
+  - Specifies the time limit for the interactive job in minutes. Acceptable formats for time are `minutes`, `hours:minutes:seconds`, and `days-hours:minutes`.
+
+`--constraint=<CPUTYPE>`
+  - (OPTIONAL) Requests that the interactive session only execute on nodes having a specific type of cpu. for example, if you only wanted to run on Intel CPUs, use `--constraint=intel`.
+
+`-w <NODENAME>`
+  - (OPTIONAL) requests that the interactive session execute on a specific node.
+
+`--no-requeue`
+  - (OPTIONAL) tells the slurm scheduler not to automatically re-submit your job when a node fails and reboots. It is always best to manually restart your geos-chem simulation using the most recently-created restart file.
+
+`/bin/bash`
+  - The unix shell (in this case, bash) that you want to use for the interactive session. in this case, because we are using bash, your `.bashrc` (and any alias files like `.bash_aliases` or `.my_personal_settings`) will be sourced.
+
+After you request an interactive session, you may notice that your login prompt may change. For example, when you log into cannon using `login.rc.fas.harvard.edu`, your unix prompt may have looked like this:
 
 ``` 
-   USER@rclogin09
+   USER@holylogin04
 ```
 
-But in the interactive session, your prompt may look something like
-this:
+But in the interactive session, your prompt may look something like this:
 
 ``` 
    USER@holyc19315
 ```
 
-NOTE: If you are on the one of the `holy*` nodes on Cannon, then this
-means you are on a machine in Holyoke, MA (about 100 miles from
-Harvard). You may experience some slight delays due to the network.
+NOTE: if you are on the one of the `holy*` nodes on cannon, then this means you are on a machine in holyoke, ma (about 100 miles from Harvard).
 
-**Example 1: Start an interactive session with 4 CPUs and load Intel
-Fortran 11:**
+#### Example: Interactive session with 8 CPUs and load GNU compilers 10.2.0
 
 ``` 
-   srun -p test --pty --x11=first --mem=8000 -c 4 -N 1 /bin/bash
-   awake.sh &
-   load_if11
+srun -p test --pty --x11=first --mem=8000 -c 8 -n 1 /bin/bash
+source ~/gcc_cmake.gfortran102_cannon.env
 ```
-
-**Example 2: Start an interactive session with 8 CPUs and load GNU
-Fortran 7.1:**
-
-``` 
-  srun -p test --pty --x11=first --mem=8000 -c 8 -N 1  /bin/bash
-  awake.sh &
-  load_gf71
-```
-
-**NOTES:**
-
-1.  You may use other compilers in your interactive session. Simply
-    type:
-      - load\_if15 (Intel Fortran 15.0.0)
-      - load\_if17 (Intel Fortran 17.0.4) 
-      - load\_gf71 (GNU Fortran 7.1.0)
-      - load\_gf82 (GNU Fortran 8.2.0)
-
-<!-- end list -->
-
-1.  Memory is specified in MB. So in the 4 CPU example, `--mem=8000`
-    asks for 8 GB of total memory for the job. This should be sufficient
-    run a 4x5 simulation.
-2.  The `OMP_NUM_THREADS` variable for OpenMP is set for you
-    automatically when you load the modules by typing one the load\_\*
-    commands listed above.
-3.  The `awake.sh` script will be [described in more detail
-    below](#Problem%20with%20Cannon%20interactive%20sessions%20freezing%20up).
-
-\--- *GEOS-Chem Support Team 2018/02/26 21:15*
 
 ### Using the interactive\_openmp script
 
-**NOTE: This is the recommended method of starting an interactive
-session\!**
+**NOTE: This is the recommended method of starting an interactive session\**
 
-For your convenience, the GEOS-Chem Support Team has created a script
-called `interactive_openmp` that will issue [the SLURM `srun`
-command](#Using%20the%20SLURM%20srun%20command) with all of the proper
-options for you. You may download `interactive_openmp` from [our
-repository of system startup scripts](/wiki/as/startup_scripts). Make
-sure to copy `interactive_openmp` into your `~/bin` directory on
-Odyssey.
+For your convenience, the GEOS-Chem Support Team has created a script called `interactive_openmp` that will issue [the SLURM `srun` command](#Using%20the%20SLURM%20srun%20command) with all of the proper options for you. You may download `interactive_openmp` from the [`cannon-env` repository of startup scripts](https://github.com/Harvard-ACMG/cannon-env). Make sure to copy `interactive_openmp` into your `~/bin` directory on Cannon.
 
 The `interactive_openmp` script takes up to 4 arguments:
 
@@ -168,7 +108,7 @@ The `interactive_openmp` script takes up to 4 arguments:
 | 1  | \# of cores for the interactive session                                               | Required | \-      |
 | 2  | Total memory for the entire job                                                       | Required | MB      |
 | 3  | Length of time for the interactive session to run                                     | Required | minutes |
-| 4  | Name of the SLURM partition where the interactive session will run (default = `test`) | Optional | \-      |
+| 4  | Name of the SLURM partition (default = `test`) | Optional | \-      |
 
 The first 3 arguments are mandatory. If you omit the 4th argument, the
 interactive session will run on the `test` partition.
@@ -212,8 +152,6 @@ within an interactive session, simply type:
 
 where `<NUMBER-OF-CORES>` is the new number of cores that you want to
 use.
-
-\--- *[Bob Yantosca](yantosca@seas.harvard.edu) 2018/02/26 21:51*
 
 ### Problem with Cannon interactive sessions freezing up
 
