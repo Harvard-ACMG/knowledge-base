@@ -1,6 +1,6 @@
 # Harvard-ACMG Knowledge Base
 
-Contains information about getting up and running with computational resources in the Harvard Atmospheric Chemistry Modeling Group.
+The Harvard-ACMG Knowledge Base contains information about getting started with local computational resources.  We hope that new Harvard-ACMG members will find this information useful.
 
 ## Contents
 
@@ -29,4 +29,7 @@ Contains information about getting up and running with computational resources i
   - Other resources
     - [FASRC documentation page](https://docs.rc.fas.harvard.edu)
     - [Cannon Cluster Quick Start Guide](https://docs.rc.fas.harvard.edu/kb/quickstart-guide/)
-    
+
+## Reporting typos, etc.
+
+Please use the [Harvard-ACMG issue tracker](https://github.com/Harvard-ACMG/knowledge-base/issues) to report any typos or outdated content.  We strive to keep this information as current as possible.

@@ -70,4 +70,4 @@ See the SEAS Office of Computing [web services page](https://www.seas.harvard.ed
 
 ## Sign up for email lists
 
-See our [Mailing lists wiki page](email-lists.md) for more information how to sign up for the Harvard-ACMG GEOS-Chem email lists.
+See our [Subscribe to Email Lists](email-lists.md) page for more information how to sign up for the Harvard-ACMG GEOS-Chem email lists.
