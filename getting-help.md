@@ -13,25 +13,30 @@ For general computing issues (printing, networking, etc), contact HUIT via:
 
 ## FAS Research Computing (FASRC)
 
-For issues with Cannon, contact FAS research computing
+FASRC is responsible for supporting the Cannon computational cluster. If you encounter any issues on Cannon, open a support ticket with FASRC at this email address:
+  - Email: rchelp@rc.fas.harvard.edu
 
-  * Email: rchelp [at] rc.fas.harvard.edu
+FASRC also maintains a very good documentation page with information on how you can access Cannon remotely, as well as answers to frequently asked questions.  See:
+  - https://docs.rc.fas.harvard.edu
+
+FASRC holds weekly office hours, usually Wednesdays from 12-3, via Zoom.
   
 ## Jacob group systems administrator
 
-Judit Flo Gaya (jflo [at] as.harvard.edu]) administers the Harvard Atmospheric Sciences domain. 
+Judit Flo Gaya (jflo@as.harvard.edu]) administers the Harvard Atmospheric Sciences domain. 
 
 The following types of issues should be directed to Judit:
 
-  * Local networking issues
-  * Disk issues (or requests for storing large data sets on our shared disk servers)
+  - Local networking issues
+  - Disk issues (or requests for storing large data sets on our shared disk servers)
   * FTP and file transfer issues (e.g. how to transfer large amounts of data)
 
 ## GEOS-Chem Support
 
-To report a GEOS-Chem issue, please open a new issue on our GEOS-Chem Github issue tracker: https://github.com/geoschem/geos-chem/issues/new/choose
+The GEOS-Chem Support Team can help you resolve issues specific to GEOS-Chem.  Please open a new support request at our GEOS-Chem Github issue tracker:
+  - https://github.com/geoschem/geos-chem/issues/new/choose
 
-Please also visit the following GEOS-Chem resources:
+The GEOS-Chem Support Team has also created several user manuals for GEOS-Chem and related software.  Please see:
   - GEOS-Chem web site: http://www.geos-chem.org
   - GEOS-Chem wiki: http://wiki.geos-chem.org
   - GEOS-Chem manual: http://manual.geos-chem.org
