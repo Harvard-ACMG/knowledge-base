@@ -12,7 +12,7 @@ The Harvard University Center for the Enviroment has purchased several dedicated
 
 For most jobs, we recommmend the using `huce_intel` partition, which consists of Intel Haswell and Broadwell CPUs. This should be fine for most purposes.
 
-For more intensive modeling needs (or when `huce_intel` is busy), consider using the `huce\_cascade` partition.  This partition contains Intel Cascade Lake CPUs (which are newer and faster than the ones on `huce_intel`).
+For more intensive modeling needs (or when `huce_intel` is busy), consider using the `huce_cascade` partition.  This partition contains Intel Cascade Lake CPUs (which are newer and faster than the ones on `huce_intel`).
 
 While it is possible to start interactive sessions in the `huce_intel` or `huce_cascade` partitions, this will likely increase your [fairshare score](https://docs.rc.fas.harvard.edu/kb/fairshare/), which may cause your jobs to to take longer to start. For this reason, we recommend using the `test` partition for all interactive sessions.
 
@@ -129,7 +129,7 @@ source ~/envs/gcc_cmake.gfortran102_cannon.env
 
 Note that SLURM only requests a number of CPUs from the system, but it will not actually tell GEOS-Chem how many cores to use. Parallelized GEOS-Chem simulations will use the number of cores specified by the environment variable `$OMP_NUM_THREADS`.
 
-`$OMP_NUM_THREADS` will be set automatically for you when you source one of the [GEOS-Chem environment files](cannon-environment-files.md).  This will set `$OMP\_NUM\_THREADS` to the same number of CPUs that you requested in your
+`$OMP_NUM_THREADS` will be set automatically for you when you source one of the [GEOS-Chem environment files](cannon-environment-files.md).  This will set `$OMP_NUM_THREADS` to the same number of CPUs that you requested in your
 interactive session.
 
 If for some reason you wanted to change the value of `$OMP_NUM_THREADS` within an interactive session, simply type:
@@ -141,10 +141,9 @@ where `<NUMBER-OF-CORES>` is the new number of cores that you want to use.
 ### Problem with Cannon interactive sessions freezing up
 
 Cannon interactive sessions tend to freeze if you do not type anything at the Unix prompt for a long time.  To prevent this behavior, add this text to your `~/.ssh/config` file (or create it if it does not exist):
-
 ```
 Host *
  ServerAliveCountMax 6
  ServerAliveInterval 240
 ```
-
+This will cause a packet to be sent every 240 seconds = 4 minutes to the interactive job, which should be sufficient to keep it alive.
