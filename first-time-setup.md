@@ -14,20 +14,21 @@ This page describes how to get set up on Cannon.  Also please be sure to check o
 
   4. Connect to the Harvard Secure network following <https://getonline.harvard.edu>.
 
-  5. Request an account with Research Computing at <https://portal.rc.fas.harvard.edu/request/account/new>
-    a. Fill in your name and contact information
-    b. Pick a username
-    c. User type should be "Internal User"
-    d. The department should be "Jacob Group"
-    e. Pick a password
+  5. [Request a Cannon account](https://docs.rc.fas.harvard.edu/kb/how-do-i-get-a-research-computing-account/) with FAS Research Computing (FASRC).
 
-  6. Once you have a Research Computing account, you will need to [set up OpenAuth for two-factor authentication](https://docs.rc.fas.harvard.edu/kb/openauth/).  If you have a smartphone, we recommend using the DUO app (downloaded in a previous step) or downloading the Google Authenticator app and using that to generate your verification codes.
+  6. [Set up OpenAuth for two-factor authentication](https://docs.rc.fas.harvard.edu/kb/openauth/) once your Cannon account is approved.  You can use a smartphone app such as DUO, Google Authenticator, or similar to 
+
+  7. Familiarize yourself with the Workflow on Cannon:
+     a. View the [Cannon Introductory Training video](https://docs.rc.fas.harvard.edu/kb/quickstart-guide/#4_Review_our_introductory_training).  We also recommend taking an Intoduction to Cannon course (either by Zoom or in-person) the next time it is offered.
+     b. Review the [Cannon cluster customs and responsibilities](https://docs.rc.fas.harvard.edu/kb/responsibilities/) document.
 
 ## Install the Harvard University VPN for remote access
 
 We recommend that you use the Harvard VPN to access Harvard computational resources from off-campus. For more information, please see <https://huit.harvard.edu/vpn>.
 
 ## Log into Cannon
+
+Below you will find some important instructions for how to access Cannon remotely.  Please also refer to the [Cannon Cluster Quick Start Guide](https://docs.rc.fas.harvard.edu/kb/quickstart-guide/).
 
 ### Access Cannon from a PC or Mac
 
@@ -52,9 +53,11 @@ ssh YOUR-USERNAME@login.rc.fas.harvard.edu
 ```
 You will be prompted to type your password and two-factor code.  For more information, [please visit this page on the FASRC documentation site](https://docs.rc.fas.harvard.edu/kb/terminal-access/#Connecting_via_SSH)
 
-## Copy Cannon startup scripts
+## Download startup scripts and software environment files
 
-[Follow these instructions](cannon-environment-config.md) to copy a set of standard startup files to your own home directory on Cannon. You can modify these files to customize your Unix environment.
+Clone a copy of the [cannon-env](https://github.com/Harvard-ACMG/cannon-env) repository to your home directory.  You can then copy these scripts to your home directory and further modify them.
+
+For more information, please see our chapters on [Startup Scripts](cannon-environment-config.md) and [Environment files](cannon-environment-files.md)
 
 ## Set up printer drivers on your PC or Mac
 
