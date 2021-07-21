@@ -16,7 +16,7 @@ This page describes how to get set up on Cannon.  Also please be sure to check o
 
   5. [Request a Cannon account](https://docs.rc.fas.harvard.edu/kb/how-do-i-get-a-research-computing-account/) with FAS Research Computing (FASRC).
 
-  6. [Set up OpenAuth for two-factor authentication](https://docs.rc.fas.harvard.edu/kb/openauth/) once your Cannon account is approved.  You can use a smartphone app such as DUO, Google Authenticator, or similar to
+  6. [Set up OpenAuth for two-factor authentication](https://docs.rc.fas.harvard.edu/kb/openauth/) once your Cannon account is approved.  You can use a smartphone app such as DUO, Google Authenticator, or similar to display the verification code.
 
   7. Familiarize yourself with the Workflow on Cannon:
     a. View the [Cannon Introductory Training video](https://docs.rc.fas.harvard.edu/kb/quickstart-guide/#4_Review_our_introductory_training).  We also recommend taking an Intoduction to Cannon course (either by Zoom or in-person) the next time it is offered.
