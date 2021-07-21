@@ -1,22 +1,17 @@
 # Book a meeting in the Jacob Group Conference Room
 
-We have created a Google calendar named **Jacob group conference room**,
-which is linked to the Jacob group email list
-(`jacob-group@g.harvard.edu`). You can use this calendar to reserve the
-Jacob group conference room (Pierce 110E) for your research meetings and
+We have created a Google calendar named **Jacob group conference room**, which is linked to the Jacob group email list
+(`jacob-group@g.harvard.edu`). You can use this calendar to reserve the Jacob group conference room (Pierce 110E) for your research meetings and
 telecons.
 
-Permission to update the Jacob group conference room calendar is granted
-to all members of the Jacob group who:
+Permission to update the Jacob group conference room calendar is granted to all members of the Jacob group who:
 
 1.  Have a valid `g.harvard.edu` email address, and
 2.  Are subscribed to the Jacob group email list
     (`jacob-group@g.harvard.edu`)
 
-If you are new to the Jacob group, then please contact Harvard
-University IT, who can set you up with a `g.harvard.edu` email address.
-Then contact the GEOS-Chem Support Team, who can add you to the Jacob
-group email list.
+If you are new to the Jacob group, then please contact Harvard University IT, who can set you up with a `g.harvard.edu` email address.
+Then contact the GEOS-Chem Support Team, who can add you to the Jacob group email list.
 
 ## Adding events to the Jacob group conference room calendar
 
@@ -29,7 +24,7 @@ new event to the Jacob group conference room calendar:
 **(2)** Click on the date of your event. A popup box will ask you to add
 an event title and time.
 
-![add\_title\_time.png](/wiki/as/add_title_time.png)
+![add\_title\_time.png](./images/add_title_time.png)
 
 **(3)** Click on **More options** to further refine the event.
 
