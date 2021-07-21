@@ -1,0 +1,370 @@
+# Using Slurm to submit jobs on Cannon (part 2)
+
+## Submit jobs to the queue
+
+Large jobs (e.g. GEOS-Chem simulations) should be submitted as a batch job.  This will run your job in non-interactive mode on one of the computational nodes.
+using a script.
+
+### Set up a run script
+
+Each GEOS-Chem Classic or GCHP run directory that you create will contain sample run scripts that you can modify.  Here are some examples:
+
+  - GEOS-Chem Classic run script: [geoschem.run](https://github.com/geoschem/geos-chem/blob/main/run/GCClassic/runScriptSamples/geoschem.run)
+
+  - GCHP run script [GCHP run](https://github.com/geoschem/geos-chem/blob/main/run/GCHP/runScriptSamples/operational_examples/harvard_gcst/gchp.run)
+
+### Submit a batch job
+
+You can use the Slurm `sbatch` command to submit a batch job:
+
+``` 
+   sbatch geoschem.run
+```
+
+### Specify job dependencies
+
+Some jobs may need to be split up into a series of several jobs. To run a set of jobs in a specified order, you will need to make each job dependent on another job so that it won't execute until the earlier job has finished. You can specify job dependencies in SLURM using the `--dependency` option. For example:
+
+``` 
+  sbatch geoschem.run.1
+  sbatch --dependency=afterok:JOBID geoschem.run.2
+```
+
+The dependency type `afterok` means that the second job will only begin after the specified `JOBID` has successfully executed.
+
+### Check when your job will start
+
+Adding this tag
+
+    #SBATCH --test-only
+
+at the top of your GEOS-Chem run script will invoke SLURM's "dry-run" option. SLURM will not schedule your job, but will instead return its interpretation of the requested resources and an example time for when it would be scheduled to run based on the current queue load. Here is a sample output:
+
+    sbatch: Job 40513378 to start at 2018-03-31T15:16:26 using 24 processors on holyjacob01
+
+This option can be very useful in helping to determine your workflow. If your job is not scheduled to start for a long time, you might want to consider starting other jobs that request less memory, cores, and/or time first.
+
+For more information, also see: <https://docs.rc.fas.harvard.edu/kb/running-jobs/>
+
+### Cancel a job
+
+To kill a job that you've submitted, use the `scancel` command:
+
+``` 
+   scancel JOBID
+```
+
+## Check the status of jobs
+
+There are several ways in which you can get information about running or completed Slurm jobs
+
+### squeue 
+
+The Slurm `squeue` command will let you check the status of all of your current jobs (both interactive and queued).
+
+NOTE: FAS Research Computing (RC) recommends that you restrict the `squeue` search (as described below), or else it will have to sift through all of the running jobs. This can have a negative impact on performance.
+
+You can look for all jobs being run by a single user by typing:
+
+``` 
+squeue -u USERNAME
+```
+
+You can also check the status of all jobs running in a particular partition using the `-p` option. For example to check the status jobs running on the `jacob` partition, type:
+
+``` 
+squeue -p jacob
+```
+
+### scontrol
+
+If your SLURM job is currently running, you can use the `scontrol` command to get the SLURM configuration and job state. Typing a command such as:
+
+``` 
+scontrol show job 50499419
+```
+
+returns the following output:
+
+    JobId=50499419 JobName=job.v11-01d
+       UserId=ryantosca(556074) GroupId=jacob_lab(40114)
+       Priority=116581311 Nice=0 Account=jacob_lab QOS=normal
+       JobState=RUNNING Reason=None Dependency=(null)
+       Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0
+       RunTime=19:21:14 TimeLimit=1-02:00:00 TimeMin=N/A
+       SubmitTime=2015-10-28T16:12:07 EligibleTime=2015-10-28T16:12:07
+       StartTime=2015-10-28T16:12:38 EndTime=2015-10-29T18:12:41
+       PreemptTime=None SuspendTime=None SecsPreSuspend=0
+       Partition=jacob AllocNode:Sid=rclogin12:27575
+       ReqNodeList=(null) ExcNodeList=(null)
+       NodeList=holyseas03
+       BatchHost=holyseas03
+       NumNodes=1 NumCPUs=8 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+       Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+       MinCPUsNode=1 MinMemoryCPU=2200M MinTmpDiskNode=0
+       Features=(null) Gres=(null) Reservation=(null)
+       Shared=OK Contiguous=0 Licenses=(null) Network=(null)
+       Command=/n/home09/ryantosca/regal/UT/jobs/job.v11-01d
+       WorkDir=/n/regal/jacob_lab/ryantosca/UT/logs/v11-01d
+       StdErr=/n/home09/ryantosca/regal/UT/logs/v11-01d/v11-01d.stderr.log
+       StdIn=/dev/null
+       StdOut=/n/home09/ryantosca/regal/UT/logs/v11-01d/v11-01d.stdout.log
+
+NOTE: This information will be purged from memory 5 minutes after your job finishes. But you can use either `sacct`, `jobinfo` (recommended\!) or `jobstats` to view the results of a completed SLURM job as described below.
+
+### sacct
+
+If you know the SLURM job ID number, you can use the `sacct` command to get information for a current or past SLURM job. Typing
+
+``` 
+sacct -l -j JOBID
+```
+
+will return the "long" output information (specified with `-l`). Note that the default output format contains many columns, which may get wrapped around on your screen. For example, here is output from an actual SLURM job:
+
+``` 
+sacct -l -j 50499419
+
+       JobID     JobIDRaw    JobName  Partition  MaxVMSize  MaxVMSizeNode  MaxVMSizeTask  AveVMSize     MaxRSS MaxRSSNode MaxRSSTask     AveRSS MaxPages
+ MaxPagesNode   MaxPagesTask   AvePages     MinCPU MinCPUNode MinCPUTask     AveCPU   NTasks  AllocCPUS    Elapsed      State ExitCode AveCPUFreq ReqCPUFreq
+     ReqMem ConsumedEnergy  MaxDiskRead MaxDiskReadNode MaxDiskReadTask    AveDiskRead MaxDiskWrite MaxDiskWriteNode MaxDiskWriteTask   AveDiskWrite
+    AllocGRES      ReqGRES 
+------------ ------------ ---------- ---------- ---------- -------------- -------------- ---------- ---------- ---------- ---------- ---------- --------
+ ------------ -------------- ---------- ---------- ---------- ---------- ---------- -------- ---------- ---------- ---------- -------- ---------- ----------
+ ---------- -------------- ------------ --------------- --------------- -------------- ------------ ---------------- ---------------- -------------- ------------
+ ------------ 
+50499419     50499419     job.v11-0+      jacob
+  
+                                                                                                                              8   19:03:17
+RUNNING      0:0               Unknown     2200Mc                 
+```
+
+You may also specify which information you would like to obtain for your job with the `--format` keyword. You can select only the most relevant fields:
+
+``` 
+   sacct -j 50499419 --format=JobID,JobName,User,Partition,NNodes,NCPUS,MaxRSS,CPUTimeRAW,Elapsed
+```
+
+which returns this shortened output:
+
+``` 
+       JobID    JobName      User  Partition   NNodes      NCPUS     MaxRSS CPUTimeRAW    Elapsed 
+------------ ---------- --------- ---------- -------- ---------- ---------- ---------- ---------- 
+50499419     job.v11-0+ ryantosca      jacob        1          8                552864   19:11:48 
+```
+
+For more information on the job accounting fields for the `--format`
+option, see <http://slurm.schedmd.com/sacct.html>.
+
+### jobinfo
+
+For your convenience, the GEOS-Chem Support Team has created the `jobinfo` script. This script calls `sacct -l -j` ([as described in the preceding section](#sacct), and then parses the output into an easy-to-read format. All non-blank fields from `sacct` output will be displayed.
+
+You can obtain the `jobinfo` script from our [`cannon-env`](https://github.com/Harvard-ACMG/cannon-env) repository of system startup scripts].  You may also view it directly by [clicking this link](https://github.com/Harvard-ACMG/cannon-env/blob/main/bin/jobinfo).
+
+To check get information of a job, simply type:
+
+``` 
+jobinfo JOBID
+```
+
+If the job is running, your output will look similar to this:
+
+``` 
+jobinfo 50618631
+
+JobName          : job.v11-01d           
+Submit           : 2015-10-30 10:38:48   
+Start            : 2015-10-30 10:38:51   
+End              : Unknown               
+JobID            : 50618631     
+JobIDRaw         : 50618631
+JobName          : job.v11-01d
+Partition        : jacob                 
+AllocCPUS        : 8                     
+Elapsed          : 02:14:31              
+State            : RUNNING               
+ExitCode         : 0:0                   
+ReqCPUFreq       : Unknown               
+ReqMem           : 3 GB/cpu              
+TotalReqMem      : 24 GB
+```
+
+If the job has finished, the output will contain additional information, including the amount of memory and CPU time that was actually used:
+
+``` 
+jobinfo 51519789
+
+JobName          : run_geos_chem         batch                 
+Submit           : 2015-11-10 14:44:23   2015-11-10 14:44:24   
+Start            : 2015-11-10 14:44:24   2015-11-10 14:44:24   
+End              : 2015-11-10 15:02:08   2015-11-10 15:02:08   
+UserCPU          : 01:53:14              01:53:14              
+TotalCPU         : 01:54:28              01:54:28              
+JobID            : 51519789              51519789.ba+          
+JobIDRaw         : 51519789              51519789.ba+          
+JobName          : run_geos_chem         batch                 
+Partition        : jacob                                       
+MaxVMSize        :                       9.4849 GB             
+MaxVMSizeNode    :                       holyseas03            
+MaxVMSizeTask    :                       0                     
+AveVMSize        :                       9.4849 GB             
+MaxRSS           :                       5.5698 GB             
+MaxRSSNode       :                       holyseas03            
+MaxRSSTask       :                       0                     
+AveRSS           :                       5.5698 GB             
+MaxPages         :                       0.0007 GB             
+MaxPagesNode     :                       holyseas03            
+MaxPagesTask     :                       0                     
+AvePages         :                       0.0007 GB             
+MinCPU           :                       01:44:55              
+MinCPUNode       :                       holyseas03            
+MinCPUTask       :                       0                     
+AveCPU           :                       01:44:55              
+NTasks           :                       1                     
+AllocCPUS        : 8                     8                     
+Elapsed          : 00:17:44              00:17:44              
+State            : COMPLETED             COMPLETED             
+ExitCode         : 0:0                   0:0                   
+AveCPUFreq       :                       0.253 GHz             
+ReqCPUFreq       : Unknown               0                     
+ReqMem           : 8 GB/node             8 GB/node             
+ConsumedEnergy   :                       0                     
+MaxDiskRead      :                       3.233 GB              
+MaxDiskReadNode  :                       holyseas03            
+MaxDiskReadTask  :                       0                     
+AveDiskRead      :                       3.233 GB              
+MaxDiskWrite     :                       0.001 GB              
+MaxDiskWriteNode :                       holyseas03            
+MaxDiskWriteTask :                       0                     
+AveDiskWrite     :                       0.001 GB              
+TotalReqMem      : 8 GB                  8 GB
+```
+
+The job is represented in two columns. The first column shows the partition (aka run queue) to which the job was submitted (in this case, `jacob`). The second column contains statistics for the actual node that the job ran on (in this case, `holyseas03`). Also note that `jobinfo` reports all memory values in GB, so you don't have to do the unit conversion from MB or KB in your head.
+
+The `JobName` field---which displays the name of the script that SLURM is executing---will be displayed with a default width of 20 characters. You can specify a different width for `JobName` by passing a second argument to `jobinfo`. For example:
+
+``` 
+jobinfo 51519789 30
+```
+
+will display `JobName` with a width of 30 characters.
+
+### jobstats
+
+For your convenience, the GEOS-Chem Support Team has created a script called `jobstats` that displays the most important job statistics. 
+
+You can obtain the `jobstats` script from our [`cannon-env`](https://github.com/Harvard-ACMG/cannon-env) repository of system startup scripts].  You may also view it directly by [clicking this link](https://github.com/Harvard-ACMG/cannon-env/blob/main/bin/jobstats).
+
+We'll use the same JOBID from the previous section. If you type:
+
+``` 
+jobstats 51519789
+```
+
+you will get the following output:
+
+``` 
+SLURM JobID #         : 51519789
+Job Name              : run_geos_chem
+Submit time           : 2015-11-10 14:44:23
+Start  time           : 2015-11-10 14:44:24
+End    time           : 2015-11-10 15:02:08
+Partition             : jacob
+Node                  : holyseas03
+CPUs                  : 8
+Memory                : 5.5698 GB
+CPU  Time             : 01:54:28    (       6868 s)
+Wall Time             : 00:17:44    (       1064 s)
+CPU  Time / Wall Time : 6.4549      ( 80.69% ideal)
+```
+
+The quantity `CPU Time / Wall Time` is the ratio of the SLURM output fields `TotalCPU / Elapsed`. This ratio is an approximate measure of how efficiently your job has been parallelized.
+
+Because this job ran on 8 CPUs, then the ideal `CPU Time / Wall Time` ratio would have been 8. But due to computational overhead and file I/O operations, it actually has a `CPU Time / Wall Time` ratio of 6.4549. This means that the job actually ran at about 81% ( = 6.4549 / 8 \* 100% ) of ideal performance.
+
+NOTE: Slurm only counts the number of cores requested, but not the number of cores that your job actually used. In many cases (e.g. for timing tests or benchmarking), yow will want to request all of the cores on a node but only use some of them. (This prevents other people's jobs from "backfilling" onto the node your job is running on, which can affect timing results.) So if you requested all of the cores on the node, but your job only used 8 cores, then you will get a more accurate output for the "% ideal" parameter if you tell the `jobstats` script that you used 8 cores. You specify this by with the second argument, e.g.:
+```
+jobstats 51519789 8
+```
+
+### Glossary of Slurm output fields
+
+When you use the `sacct`, `scontrol`, `jobinfo`, or `jobstats` to get more information about a current or past SLURM job, you will be presented with several output fields. The most important fields are listed in the table below.
+
+A note about units:
+
+  - If you use `sacct` or `scontrol`, then MEMORY INFO fields will be displayed in either KB or MB (depending on the quantity).
+  - If you use `jobinfo` or `jobstats`, all MEMORY INFO fields will be converted to GB, for consistency's sake.
+
+| JOB INFO           | Description                                                                                                                                                                                  |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `JobName`          | Name of the script that was submitted to SLURM.                                                                                                                                              |
+| `JobID`            | The Job ID number. This is returned by the SLURM `sbatch` command (for queued jobs) or by the SLURM `srun` command (for interactive jobs).                                                   |
+| `Submit`           | Date and time when the job was submitted to SLURM. (Format is `YYYY-MM-DD hh:mm:ss`.)                                                                                                        |
+| `Start`            | Date and time when the job started running. (Uses same format as `Submit`.)                                                                                                                  |
+| `End`              | Date and time when the job stopped running. (Uses same format as `Submit`.)                                                                                                                  |
+| `Partition`        | Name of the "queue" in which the job ran. This will usually be `jacob`, `general`, or `interact`.                                                                                            |
+| `NTasks`           | Number of tasks. For GEOS-Chem "classic" simulations using OpenMP, this will always equal 1.                                                                                                 |
+| `AllocCPUS`        | Number of CPUs requested by the user.                                                                                                                                                        |
+| `Status`           | Current job status (e.g. `CANCELLED`, `COMPLETED`, `FAILED`, `PENDING`, `RUNNING`, `SUSPENDED`, `TIMEOUT`, etc.)                                                                             |
+| `ExitCode`         | Exit code issued by the job. An exit code of 0 means the job finished sucessfully. A non-zero exit code means that the job was terminated abnormally.                                        |
+| TIMING INFO        | Description                                                                                                                                                                                  |
+| `UserCPU`          | The amount of user CPU time used by the job. (Format is `DD-hh:mm:ss`, `hh:mm:ss`, or `mm:ss`, depending on how long the job ran.)                                                           |
+| `SystemCPU`        | The amount of system CPU time used by the job. (Uses same format as `UserCPU`.)                                                                                                              |
+| `TotalCPU`         | The total amount of CPU time: `TotalCPU = UserCPU + System CPU`. (Uses same format as `UserCPU`.) The `jobstats` script uses the `TotalCPU` field to compute the ratio `CPU Time/Wall Time`. |
+| `Elapsed`          | The total amount of "wall clock" time used by the job. (Uses same format as `UserCPU`.) The `jobstats` script uses the `Elapsed` field to compute the ratio `CPU Time/Wall Time`.            |
+| DISK I/O INFO      | DESCRIPTION                                                                                                                                                                                  |
+| `MaxDiskRead`      | Maximum amount of data read from disk by all tasks in a job.                                                                                                                                 |
+| `MaxDiskReadNode`  | Node on which the maximum disk read (`MaxDiskReadNode`) occurred.                                                                                                                            |
+| `MaxDiskReadTask`  | The task ID for which the maximum disk read (`MaxDiskReadNode`) occurred. NOTE: GEOS-Chem "classic" jobs always run as a single task, so the task ID will always be 0.                       |
+| `MaxDiskWrite`     | Maximum amount of data written to disk by all tasks in a job.                                                                                                                                |
+| `MaxDiskWriteNode` | Node on which the maximum disk write (`MaxDiskWriteNode`) occurred.                                                                                                                          |
+| `MaxDiskWriteTask` | The task ID for which the maximum disk read (`MaxDiskWriteNode`) occurred. NOTE: GEOS-Chem "classic" jobs always run as a single task, so the task ID will always be 0.                      |
+| MEMORY INFO        | DESCRIPTION                                                                                                                                                                                  |
+| `MaxRSS`           | Maximum amount of onboard memory (aka "resident set size") used by the job.                                                                                                                  |
+| `MaxRSSNode`       | Node on which the maximum amount of onboard memory (`MaxRSS`) occurred.                                                                                                                      |
+| `MaxRSSTask`       | The task ID for which the maximum amount onboard mamory (`MaxRSS`) occurred. NOTE: GEOS-Chem "classic" jobs always run as a single task, so the task ID will always be 0.                    |
+| `MaxVMSize`        | Maximum amount of virtual memory (VM) used by the job. Virtual memory = resident onboard memory + swap space memory.                                                                         |
+| `MaxVMSizeNode`    | Node on which the maximum amount of VM usage (`MaxVmSize`) occurred.                                                                                                                         |
+| `MaxVMSizeTask`    | The task ID for which the maximum amount VM usage (`MaxVMSize`) occurred. GEOS-Chem "classic" jobs always run as a single task, so the task ID will always be 0.                             |
+| `ReqMem`           | The amount of memory requested by the user per CPU. This is the value specified by the `--mem-per-cpu` option.                                                                               |
+| `TotalReqMem`      | This field is returned by the `jobinfo` script. It is the total amount of requested memory (i.e. `ReqMem` multiplied by `AllocCPUS`).                                                        |
+
+## Request enough time and memory
+
+SLURM requires accurate information about the resources your job will require so that it can effectively schedule jobs. Therefore, you will want to provide a best estimate for the amount of time and memory required for your simulation. Requesting too much will adversely affect your job's priority in the queue. On the other hand, insufficient time or memory will cause your job to crash abruptly.
+
+FASRC Research Computing recommends over-asking for your first job and then adjusting the time and memory requests for all subsequent jobs. The `sacct` command [described above](#sacct) can provide you with that information (look for `Elapsed` and `MaxRSS` in the output). 
+
+To run GEOS-Chem in an interactive session or in the queue, all of the memory should be on the same node. That is why you need to use `-N 1` in the call to `srun` and in the `SBATCH` commands.
+
+### Beware of requesting more time or memory than is available
+
+Slurm will queue jobs that have requested resources that are unavailable. It doesn't distinguish between constraints due to usage and constraints due to the SLURM configuration. You can, for example, request more time than the maximum time limit for the partition and Slurm will happily queue your job even though it is unlikely to ever run.
+
+If you requested that a job run for 10 days on the shared partition, the job would be queued, and the squeue command would show `PartitionTimeLimit` as the reason it is pending. To determine the partition time limit, you could run the command
+
+``` 
+scontrol show partition shared
+```
+
+and you'd see that the default time limit is 10 minutes and the maximum time limit is 7 days. In that case, you can cancel the job and resubmit using a smaller time limit.
+
+As described above, you could also [use the Slurm dry-run option](#Check%20when%20your%20job%20will%20start) to ask SLURM when it thinks your job will begin executing, based on the current conditions.
+
+## Check your fairshare score
+
+If there are sufficient resources (i.e. cores and memory) on a given partition, then SLURM will typically start your job right away. But if all cores on the partition are currently in use, or there is not enough memory to run your job, then SLURM will cause your job to wait for a certain period before it starts.
+
+SLURM computes a `fairshare` score (on a scale of 0 to 1), which is a factor that helps to determine how quickly a job will start. A fairshare is computed for each lab group, and all users in the group will have the same fairshare. Users having a higher fairshare can expect that their jobs will start running sooner than users with a lower fairshare. But even if a user has a low fairshare score, their job will be moved up in priority if the job has been pending for a very long time. So the priority at which a job starts is a combination of the user's fairshare score and the time it has been queued.
+
+We recommend that you read FASRC's highly-comprehensive description of how the fairshare score is determined: <https://www.rc.fas.harvard.edu/fairshare/>
+
+You can also use the following useful aliases to check your fairshare. Add these to your `~/.bash_aliases` or `~/.my_personal_settings` file:
+
+`alias myfs="sshare -u <Username> -U"`
+  - Display your [Fair-Share factor and other Slurm share information](https://slurm.schedmd.com/sshare.html) (replace `<Username>` with your username)
+
+`alias jacobfs="sshare -A jacob_lab -a"`
