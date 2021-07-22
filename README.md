@@ -8,7 +8,7 @@ The Harvard-ACMG Knowledge Base contains information about getting started with 
 
   - Getting started on the FASRC Cannon cluster
     - [Set up SSH keys for accessing Cannon and other remote machines](setting-up-ssh-keys.md)
-     -[Install configuration files from our `cannon-env` repository](https://github.com/Harvard-ACMG/cannon-env)
+    - [Install configuration files from our `cannon-env` repository](https://github.com/Harvard-ACMG/cannon-env)
     - [List of local resources on Cannon](local-resources-on-cannon.md)
     - [Know how to prevent RSI injury](prevent-rsi-injury.md)
 
