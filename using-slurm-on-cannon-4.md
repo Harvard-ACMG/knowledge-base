@@ -4,7 +4,7 @@
 
 SLURM requires accurate information about the resources your job will require so that it can effectively schedule jobs. Therefore, you will want to provide a best estimate for the amount of time and memory required for your simulation. Requesting too much will adversely affect your job's priority in the queue. On the other hand, insufficient time or memory will cause your job to crash abruptly.
 
-FASRC Research Computing recommends over-asking for your first job and then adjusting the time and memory requests for all subsequent jobs. The `sacct` command [described above](#sacct) can provide you with that information (look for `Elapsed` and `MaxRSS` in the output). 
+FASRC Research Computing recommends over-asking for your first job and then adjusting the time and memory requests for all subsequent jobs. The `sacct` command [described above](using-slurm-on-cannon-3.md#sacct) can provide you with that information (look for `Elapsed` and `MaxRSS` in the output). 
 
 To run GEOS-Chem in an interactive session or in the queue, all of the memory should be on the same node. That is why you need to use `-N 1` in the call to `srun` and in the `SBATCH` commands.
 
@@ -20,7 +20,7 @@ scontrol show partition shared
 
 and you'd see that the default time limit is 10 minutes and the maximum time limit is 7 days. In that case, you can cancel the job and resubmit using a smaller time limit.
 
-As described above, you could also [use the Slurm dry-run option](#Check%20when%20your%20job%20will%20start) to ask SLURM when it thinks your job will begin executing, based on the current conditions.
+As described above, you could also [use the Slurm dry-run option](using-slurm-on-cannon-2.md#Check%20when%20your%20job%20will%20start) to ask SLURM when it thinks your job will begin executing, based on the current conditions.
 
 ## Check your fairshare score
 
