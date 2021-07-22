@@ -23,7 +23,7 @@ The Harvard-ACMG Knowledge Base contains information about getting started with 
     - [Subscribe to email lists](email-lists.md)
     - [Book the Jacob-group conference Room (P110E)](book-the-conference-room.md)
 
-  - [Whom may I conatact for assistance?](getting-help.md)
+  - [Whom may I contact for assistance?](getting-help.md)
 
   - Other resources
     - [FASRC documentation page](https://docs.rc.fas.harvard.edu)
